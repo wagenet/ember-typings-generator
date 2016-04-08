@@ -82,9 +82,15 @@ function partsRegexp(parts) {
 }
 
 const RELATIVE_NAMES = {
-  'Ember.Array': 'Ember.Array',
   'RSVP.Promise': 'Ember.RSVP.Promise'
 };
+
+const BUILT_IN = [
+  'Function',
+  'String',
+  'Array',
+  'Object'
+];
 
 function relativeName(name, base) {
   let parts = base.split('.');
@@ -103,14 +109,11 @@ function relativeName(name, base) {
   if (RELATIVE_NAMES[name]) { return RELATIVE_NAMES[name]; }
 
   let reStr = `^(${partsRegexp(parts)})`;
-  return name.replace(new RegExp(reStr), '');
-}
+  let relative = name.replace(new RegExp(reStr), '');
 
-const BUILT_IN = [
-  'Function',
-  'String',
-  'Array'
-];
+  // If relativizing would conflict with built ins, don't relativize
+  return (BUILT_IN.indexOf(relative) > -1) ? name : relative;
+}
 
 class Klass {
   constructor(name, data) {
@@ -182,7 +185,17 @@ class Klass {
 
     if (this.data.extends) {
       let klass = Klass.find(this.data.extends);
-      this.extends = klass;
+      if (klass) {
+        this.extends = klass;
+
+        klass.postProcess();
+        let parentCreate = klass.items.get('static:create');
+        if (parentCreate) {
+          this.items.set('static:create', new ClassItem(parentCreate.data, this));
+        }
+      } else {
+        console.warn(`Can't find extended class; child=${this.fullName} parent=${this.data.extends}`);
+      }
     }
 
     if (this.data.uses) {
@@ -330,7 +343,17 @@ class ClassItem {
 
     if (data.return) {
       this.returnType = data.return.type ? convertType(data.return.type, this.klass.fullName) : 'void';
+    } else if (this.static && this.name === 'create') {
+      // HAX
+      this.returnType = this.klass.name;
     }
+  }
+
+  get key() {
+    let str = '';
+    if (this.static) { str += 'static:'; }
+    str += this.name;
+    return str;
   }
 
   get docs() {
@@ -486,10 +509,10 @@ docs.classitems.forEach(data => {
   // If no name exists, it's bad data
   if (data.name && (data.itemtype === 'method' || data.itemtype === 'property')) {
     let item = new ClassItem(data, klass);
-    if (klass.items.has(item.name)) {
-      console.warn(`Duplicate item for klass; klass=${klass.fullName}, item=${item.name}`);
+    if (klass.items.has(item.key)) {
+      console.warn(`Duplicate item for klass; klass=${klass.fullName}, item=${item.key}`);
     }
-    klass.items.set(item.name, item);
+    klass.items.set(item.key, item);
   }
 });
 
@@ -537,7 +560,7 @@ function writeNamespace(wstream, namespace, prefix) {
     wstream.write(`${prefix}${declareExport} namespace ${namespace.name} {\n`);
 
     let selfClass = namespace.parent.classes.get(namespace.name);
-    if (selfClass) {
+    if (selfClass && !selfClass.isTrueClass) {
       writeItems(wstream, selfClass, childPrefix);
     }
   }

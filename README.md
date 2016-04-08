@@ -33,3 +33,4 @@ npm test
 * See if we can further improve methods with multiple signatures
 * Better handling of undeclared constants
 * Consider pre-processing the docs.json so we can move hacks out of main generator code
+* Basic generation tests
