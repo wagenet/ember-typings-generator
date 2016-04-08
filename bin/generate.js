@@ -96,7 +96,7 @@ function relativeName(name, base) {
   let parts = base.split('.');
 
   // Find the full class name so we can handle it correctly in RELATIVE_NAMES!
-  if (/^[A-Z]/.test(name)) {
+  if (BUILT_IN.indexOf(name) === -1 && /^[A-Z]/.test(name)) {
     for (let size=parts.length; size > 0; size--) {
       let klass = Klass.find(parts.slice(0,size).join('.')+`.${name}`, { allowMissingNamespace: true });
       if (klass) {
