@@ -7,10 +7,11 @@
     "ember-typings-generator": "./bin/generate.js"
   },
   "scripts": {
+    "update": "rm -rf source && git clone --depth 1 https://github.com/components/ember.git source",
     "build": "./bin/generate.js source/ember-docs.json",
     "lint": "echo linting... && tslint \"**/*.ts\" -e \"node_modules/**\" -e \"typings/**\"",
     "test": "npm run lint",
-    "build+test": "npm run build && npm run lint"
+    "update+build+test": "npm run update && npm run build && npm run lint"
   },
   "devDependencies": {
     "ts-node": "^0.7.1",

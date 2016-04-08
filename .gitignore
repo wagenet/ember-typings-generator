@@ -40,5 +40,8 @@ node_modules
 # typings
 typings
 
+# Ember source
+source
+
 # generated index.d.ts
 index.d.ts

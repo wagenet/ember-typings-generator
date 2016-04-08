@@ -12,8 +12,10 @@ ember-typings-generator INPUT [OUTPUT=index.d.ts]
 ## Contributing
 ```sh
 # Fork this repo
-git submodule update --init
 npm install
+
+# Update the ember repo
+npm run update [-- --branch=TAG]
 
 # Build index.d.ts
 npm build
