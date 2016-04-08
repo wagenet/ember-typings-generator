@@ -359,10 +359,10 @@ class ClassItem {
     if (this.klass.isNamespace && !this.klass.isTrueClass) {
       // REVIEW: Should we expect these items to be marked as static?
       if (this.itemType === 'method') {
-        str += 'function ';
+        str += 'export function ';
       } else {
         // Property
-        str += 'var ';
+        str += 'export var ';
       }
     } else if (this.static) {
       str += 'static ';
@@ -455,16 +455,32 @@ let rawData = fs.readFileSync(INPUT, { encoding: 'utf8' });
 let docs = JSON.parse(rawData);
 
 
+
+const IGNORE = [
+  'Ember.Templates'
+];
+
+function ignoreItem(name) {
+  return IGNORE.some(i => {
+    return name === i || name.slice(0, i.length+1) === `${i}.`;
+  });
+}
+
+
 // Classes
 let classes = [];
 
 for (let name in docs.classes) {
+  if (ignoreItem(name)) { continue; }
+
   // Initialize the Klass
   let klass = Klass.create(name, docs.classes[name]);
   classes.push(klass);
 }
 
 docs.classitems.forEach(data => {
+  if (ignoreItem(data.class)) { return; }
+
   let klass = Klass.find(data.class);
 
   // If no name exists, it's bad data
