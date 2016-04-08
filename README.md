@@ -1,42 +1,31 @@
-# Typed Ember Js
-The type definition for [`ember.js`](https://github.com/emberjs/ember.js)
+# Ember Typings Generator
+For use with [typed-ember](https://github.com/wagenet/typed-ember.git).
 
 ## LICENSE
 MIT
 
-## Installation
+## Usage
 ```sh
-typings install github:wagenet/typed-ember
+ember-typings-generator INPUT [OUTPUT=index.d.ts]
 ```
 
 ## Contributing
-
 ```sh
 # Fork this repo
+git submodule update --init
 npm install
 
-npm run watch
+# Build index.d.ts
+npm build
 
-# add tests, make changes, pass tests ... then [ctrl+c]
-npm run publish
-```
-
-## Updating
-Update `typings.json/version` to match the source version you are typing against.
-e.g. if you are creating typings for `chai@3.5.0`, then:
-```js
-// typings.json
-{
-  "version": "3.5.0"
-  // ...
-}
+# Run tests against built file
+npm test
 ```
 
 ## To Do
 
 * Properly handle prototype extensions
 * Define types of arrays where possible
-* Ignore Handlebars helpers?
 * Make Ember.Handlebars accessible
 * Class constructors?
 * See if we can further improve methods with multiple signatures

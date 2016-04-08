@@ -1,4 +1,9 @@
+#!/usr/bin/env node
+
 "use strict";
+
+const INPUT = process.argv[2];
+const OUTPUT = process.argv[3] || 'index.d.ts';
 
 const fs = require('fs');
 
@@ -446,7 +451,7 @@ class ClassItemParam {
   }
 }
 
-let rawData = fs.readFileSync('source/ember-docs.json', { encoding: 'utf8' });
+let rawData = fs.readFileSync(INPUT, { encoding: 'utf8' });
 let docs = JSON.parse(rawData);
 
 
@@ -538,7 +543,7 @@ function writeNamespace(wstream, namespace, prefix) {
   }
 }
 
-var wstream = fs.createWriteStream('index.d.ts');
+var wstream = fs.createWriteStream(OUTPUT);
 wstream.once('open', () => {
   writeNamespace(wstream, Namespace.root);
   wstream.write('export default Ember;\n');

@@ -40,5 +40,5 @@ node_modules
 # typings
 typings
 
-# output folder
-out
+# generated index.d.ts
+index.d.ts
